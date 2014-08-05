@@ -6,4 +6,5 @@ AntiDaze is an addon for World of Warcraft designed to warn the using Hunter whe
 I have taken over working on this addon as the original author abandoned it in 2008.
 
 Original Author: Qsek
+
 Current Author: TorelTwiddler
