@@ -1,7 +1,7 @@
 --------------------------------------------------
 --
 --  AddOn			: AntiDaze
---  Date			: 2010.10.20
+--  Date			: 2014.10.13
 --  Author			: Qsek
 --  Burning Crusade Bugfix	: xbjim
 --  BC Multilanguage		: Minihunt EU@Ner'zhul
@@ -9,10 +9,11 @@
 --  BC Translated DE	: Endeavour EU@Arthas, Niro EU@Frostmourne
 --  Wrath Bugfix		: TorelTwiddler
 --  Cataclysm			: TorelTwiddler
---
+--  Mists of Pandaria	: TorelTwiddler
+--  Warlords of Draenor	: TorelTwiddler
 --------------------------------------------------
 
-AD_VERSION = "v1.0.1";
+AD_VERSION = "v1.0.3";
 AD_TITLE = "AntiDaze";
 AD_VERS_TITLE = AD_TITLE.." "..AD_VERSION;
 
@@ -52,7 +53,7 @@ function AD_OnEvent(self, event, ...)
 		--do nothing
 	else
 		if (event == "UNIT_AURA") then
-			if ADOptions.ADtoggle == 1 then
+			if ADOptions.ADtoggle == 1 then				
 				if  ADOptions.ADCCheet == 1 and arg1 == "player" and PlayerBuff(BUFF_DAZED) and isCheetahActive() then
 					CPlayerBuff("JungleTiger")
 				end
@@ -154,7 +155,7 @@ function ADCCheet_Toogle()
       DEFAULT_CHAT_FRAME:AddMessage(TXT_CHEETAH_OFF, 1, 1, 0.5);
     end
 	else
-		ADOptions.ADCCheet = 1
+		ADOptions.ADCCheet = 1;
     if ( DEFAULT_CHAT_FRAME ) then
       DEFAULT_CHAT_FRAME:AddMessage(TXT_CHEETAH_ON, 1, 1, 0.5);
     end
@@ -182,7 +183,7 @@ function ADCPackPets_Toogle()
       DEFAULT_CHAT_FRAME:AddMessage(TXT_PACK_ON_PETS_OFF, 1, 1, 0.5);
     end
 	else
-		ADOptions.ADCPackPets = 1
+		ADOptions.ADCPackPets = 1;
     if ( DEFAULT_CHAT_FRAME ) then
       DEFAULT_CHAT_FRAME:AddMessage(TXT_PACK_ON_PETS_ON, 1, 1, 0.5);
     end

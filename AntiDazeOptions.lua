@@ -20,20 +20,20 @@ function ADOptions_Init()
 		ADOptions.ADtoggle = 1;
 		ADOptions.ADCCheet = 1;
 		ADOptions.ADCPack = 1;
-    ADOptions.ADCPackPets = 0;
+		ADOptions.ADCPackPets = 1;
 	elseif (ADOptions.ADtoggle == nil) then
 		ADOptions.ADtoggle = 1;
 	elseif (ADOptions.ADCCheet == nil) then
 		ADOptions.ADCCheet = 1;
 	elseif (ADOptions.ADCPack == nil) then
 		ADOptions.ADCPack = 1;
-  elseif (ADOptions.ADCPackPets == nil) then
-		ADOptions.ADCPackPets = 0;
+	elseif (ADOptions.ADCPackPets == nil) then
+		ADOptions.ADCPackPets = 1;
 	end
 	AntiDazeOptionsFrameADtoggle:SetChecked(ADOptions.ADtoggle);
 	AntiDazeOptionsFrameADCCheet:SetChecked(ADOptions.ADCCheet);
-  AntiDazeOptionsFrameADCPack:SetChecked(ADOptions.ADCPack);
-  AntiDazeOptionsFrameADCPackPets:SetChecked(ADOptions.ADCPackPets)
+	AntiDazeOptionsFrameADCPack:SetChecked(ADOptions.ADCPack);
+	AntiDazeOptionsFrameADCPackPets:SetChecked(ADOptions.ADCPackPets)
 end
 
 function ADOptions_OnHide()
