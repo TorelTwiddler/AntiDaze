@@ -6,12 +6,14 @@ function ADOptions_Toggle()
     end
 end
 
-function ADOptions_OnLoad()
-    UIPanelWindows['AntiDazeOptionsFrame'] = { area = 'center', pushable = 0 };
+function ADOptions_OnLoad(panel)
+    panel.name = "AntiDaze " .. GetAddOnMetadata("AntiDaze", "Version")
+    panel.okay = function (self) AdOptions_OnHide(); end;
+    InterfaceOptions_AddCategory(panel);
 end
 
 
-function ADOptions_OnShow()
+function ADOptions_OnShow(self)
 end
 
 function ADOptions_Init()
@@ -36,7 +38,7 @@ function ADOptions_Init()
     AntiDazeOptionsFrameADCPackPets:SetChecked(ADOptions.ADCPackPets)
 end
 
-function ADOptions_OnHide()
+function ADOptions_OnHide(self)
     local frame = CreateFrame("FRAME", "ADOptions_OnHideFrame");
     if (MYADDONS_ACTIVE_OPTIONSFRAME == frame) then
         ShowUIPanel(myAddOnsFrame);

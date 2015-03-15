@@ -1,48 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 	<Script file="AntiDazeOptions.lua"/>
-	<Frame name="AntiDazeOptionsFrame" toplevel="true" frameStrata="DIALOG" movable="true" enableMouse="true" hidden="true" parent="UIParent" enableKeyboard="true">
-		<Size>
-			<AbsDimension x="400" y="200"/>
-		</Size>
-		<Anchors>
-			<Anchor point="CENTER"/>
-		</Anchors>
-		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
-			<BackgroundInsets>
-				<AbsInset left="11" right="12" top="12" bottom="11"/>
-			</BackgroundInsets>
-			<TileSize>
-				<AbsValue val="32"/>
-			</TileSize>
-			<EdgeSize>
-				<AbsValue val="32"/>
-			</EdgeSize>
-		</Backdrop>
-		<Layers>
-			<Layer level="ARTWORK">
-				<Texture name="AntiDazeOptionsFrameHeader" file="Interface\DialogFrame\UI-DialogBox-Header">
-					<Size>
-						<AbsDimension x="336" y="64"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOP">
-							<Offset>
-								<AbsDimension x="0" y="12"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</Texture>
-				<FontString inherits="GameFontNormal" text="AD_OPTIONS_TITLE">
-					<Anchors>
-						<Anchor point="TOP" relativeTo="AntiDazeOptionsFrameHeader">
-							<Offset>
-								<AbsDimension x="0" y="-14"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-			</Layer>
-		</Layers>
+	<Frame name="AntiDazeOptionsFrame" >
 		<Frames>
 			<CheckButton name="AntiDazeOptionsFrameADtoggle" inherits="OptionsCheckButtonTemplate">
 				<Anchors>
@@ -115,31 +73,16 @@
 					</OnClick>
 				</Scripts>
 			</CheckButton>
-
-			<Button name="AntiDazeOptionsFrameDone" inherits="OptionsButtonTemplate" text="Done">
-				<Anchors>
-					<Anchor point="BOTTOM">
-						<Offset>
-							<AbsDimension x="0" y="20"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						ADOptions_Toggle();
-					</OnClick>
-				</Scripts>
-			</Button>
 		</Frames>
 		<Scripts>
 			<OnLoad>
-				ADOptions_OnLoad();
+				ADOptions_OnLoad(self);
 			</OnLoad>
 			<OnShow>
-				ADOptions_OnShow();
+				ADOptions_OnShow(self);
 			</OnShow>
 			<OnHide>
-				ADOptions_OnHide();
+				ADOptions_OnHide(self);
 			</OnHide>
 		</Scripts>
 	</Frame>

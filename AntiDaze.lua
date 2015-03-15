@@ -115,8 +115,6 @@ function AD_SlashCommand(msg)
             ADCPack_Toogle()
         elseif (msg == "cpackpets") then
             ADCPackPets_Toogle()
-        elseif (msg == "gui") then
-            ADOptions_Toggle();
         else
             if (DEFAULT_CHAT_FRAME) then
                 DEFAULT_CHAT_FRAME:AddMessage(AD_VERS_TITLE, 1, 1, 0.5);
@@ -125,7 +123,6 @@ function AD_SlashCommand(msg)
                 DEFAULT_CHAT_FRAME:AddMessage(TXT_HELP3, 1, 1, 0.5);
                 DEFAULT_CHAT_FRAME:AddMessage(TXT_HELP4, 1, 1, 0.5);
                 DEFAULT_CHAT_FRAME:AddMessage(TXT_HELP5, 1, 1, 0.5);
-                DEFAULT_CHAT_FRAME:AddMessage(TXT_HELP6, 1, 1, 0.5);
             end
         end
         ADOptions_Init();
