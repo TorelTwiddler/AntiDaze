@@ -6,37 +6,27 @@ function ADOptions_Toggle()
     end
 end
 
-function ADOptions_OnLoad(panel)
-    panel.name = "AntiDaze " .. GetAddOnMetadata("AntiDaze", "Version")
-    panel.okay = function (self) AdOptions_OnHide(); end;
-    InterfaceOptions_AddCategory(panel);
-end
-
-
-function ADOptions_OnShow(self)
-end
-
 function ADOptions_Init()
-    if (ADOptions == nil) then
+    if (ADOptions == nil) or (type(ADOptions.ADtoggle) == 'number') then
         ADOptions = {};
-        ADOptions.ADtoggle = 1;
-        ADOptions.ADCCheet = 1;
-        ADOptions.ADCPack = 1;
-        ADOptions.ADCPackPets = 1;
-        ADOptions.ADRaidWarning = 1;
-        ADOptions.ADChatMessage = 0;
-    elseif (ADOptions.ADtoggle == nil) then
-        ADOptions.ADtoggle = 1;
-    elseif (ADOptions.ADCCheet == nil) then
-        ADOptions.ADCCheet = 1;
-    elseif (ADOptions.ADCPack == nil) then
-        ADOptions.ADCPack = 1;
-    elseif (ADOptions.ADCPackPets == nil) then
-        ADOptions.ADCPackPets = 1;
-    elseif (ADOptions.ADRaidWarning == nil) then
-        ADOptions.ADRaidWarning = 1;
-    elseif (ADOptions.ADChatMessage == nil) then
-        ADOptions.ADChatMessage = 0;
+    end
+    if (ADOptions.ADtoggle == nil) then
+        ADOptions.ADtoggle = true;
+    end
+    if (ADOptions.ADCCheet == nil) then
+        ADOptions.ADCCheet = true;
+    end
+    if (ADOptions.ADCPack == nil) then
+        ADOptions.ADCPack = true;
+    end
+    if (ADOptions.ADCPackPets == nil) then
+        ADOptions.ADCPackPets = true;
+    end
+    if (ADOptions.ADRaidWarning == nil) then
+        ADOptions.ADRaidWarning = true;
+    end
+    if (ADOptions.ADChatMessage == nil) then
+        ADOptions.ADChatMessage = false;
     end
     AntiDazeOptionsFrameADtoggle:SetChecked(ADOptions.ADtoggle);
     AntiDazeOptionsFrameADCCheet:SetChecked(ADOptions.ADCCheet);
@@ -46,9 +36,8 @@ function ADOptions_Init()
     AntiDazeOptionsFrameADChatMessage:SetChecked(ADOptions.ADChatMessage)
 end
 
-function ADOptions_OnHide(self)
-    local frame = CreateFrame("FRAME", "ADOptions_OnHideFrame");
-    if (MYADDONS_ACTIVE_OPTIONSFRAME == frame) then
-        ShowUIPanel(myAddOnsFrame);
-    end
+function ADOptions_OnLoad(panel)
+    panel.name = "AntiDaze " .. GetAddOnMetadata("AntiDaze", "Version")
+    InterfaceOptions_AddCategory(panel);
 end
+

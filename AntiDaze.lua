@@ -22,6 +22,8 @@ BINDING_NAME_AD_TOGGLE = TXT_TOGGLE .. " " .. AD_TITLE;
 
 BINDING_HEADER_AD_OPTIONS_TITLE = AD_TITLE;
 
+AD_variables_loaded = false;
+
 --AD_TEXT_AURA = string.gsub(AURAADDEDOTHERHARMFUL,'%%s','(.+)')
 
 function AD_OnLoad(self)
@@ -53,20 +55,20 @@ function AD_OnEvent(self, event, ...)
         --do nothing
     else
         if (event == "UNIT_AURA") then
-            if ADOptions.ADtoggle == 1 then
-                if ADOptions.ADCCheet == 1 and arg1 == "player" and PlayerBuff(BUFF_DAZED) and isCheetahActive() then
+            if ADOptions.ADtoggle then
+                if ADOptions.ADCCheet and arg1 == "player" and PlayerBuff(BUFF_DAZED) and isCheetahActive() then
                     CPlayerBuff("JungleTiger")
                 end
-                if ADOptions.ADCPack == 1 and arg1 == "player" and PlayerBuff(BUFF_DAZED) and isPackActive() then
+                if ADOptions.ADCPack and arg1 == "player" and PlayerBuff(BUFF_DAZED) and isPackActive() then
                     CPlayerBuff("WhiteTiger")
                 end
-                if ADOptions.ADCPack == 1 and (string.find(arg1, "party%d")) and TargetBuff(BUFF_DAZED, arg1) and isPackActive() then
+                if ADOptions.ADCPack and (string.find(arg1, "party%d")) and TargetBuff(BUFF_DAZED, arg1) and isPackActive() then
                     CPlayerBuff("WhiteTiger")
                 end
-                if ADOptions.ADCPack == 1 and (string.find(arg1, "raid%d")) and TargetBuff(BUFF_DAZED, arg1) and isPackActive() then
+                if ADOptions.ADCPack and (string.find(arg1, "raid%d")) and TargetBuff(BUFF_DAZED, arg1) and isPackActive() then
                     CPlayerBuff("WhiteTiger")
                 end
-                if ADOptions.ADCPackPets == 1 and (string.find(arg1, "pet")) and TargetBuff(BUFF_DAZED, arg1) and isPackActive() then
+                if ADOptions.ADCPackPets and (string.find(arg1, "pet")) and TargetBuff(BUFF_DAZED, arg1) and isPackActive() then
                     CPlayerBuff("WhiteTiger")
                 end
             end
@@ -74,9 +76,10 @@ function AD_OnEvent(self, event, ...)
     end
 
     if (event == "VARIABLES_LOADED") then
-
-        ADOptions_Init();
-
+        if not AD_variables_loaded then
+            ADOptions_Init();
+            AD_variables_loaded = true;
+        end
         ---------------------
         -- support for Cosmos
         ---------------------
@@ -107,52 +110,34 @@ end
 function AD_SlashCommand(msg)
     local _, class = UnitClass("player");
     if (class == "HUNTER") then
-        if (msg == "toggle") then
-            AD_Toggle();
-        elseif (msg == "ccheet") then
-            ADCCheet_Toggle()
-        elseif (msg == "cpack") then
-            ADCPack_Toggle()
-        elseif (msg == "cpackpets") then
-            ADCPackPets_Toggle()
-        else
-            if (DEFAULT_CHAT_FRAME) then
-                DEFAULT_CHAT_FRAME:AddMessage(AD_VERS_TITLE, 1, 1, 0.5);
-                DEFAULT_CHAT_FRAME:AddMessage(TXT_HELP1, 1, 1, 0.5);
-                DEFAULT_CHAT_FRAME:AddMessage(TXT_HELP2, 1, 1, 0.5);
-                DEFAULT_CHAT_FRAME:AddMessage(TXT_HELP3, 1, 1, 0.5);
-                DEFAULT_CHAT_FRAME:AddMessage(TXT_HELP4, 1, 1, 0.5);
-                DEFAULT_CHAT_FRAME:AddMessage(TXT_HELP5, 1, 1, 0.5);
-            end
-        end
-        ADOptions_Init();
+        InterfaceOptionsFrame_OpenToCategory("AntiDaze " .. GetAddOnMetadata("AntiDaze", "Version"))
     else
         DEFAULT_CHAT_FRAME:AddMessage(AD_VERS_TITLE .. " " .. TXT_NOTLOADED, 1, 1, 0.5);
     end
 end
 
 function AD_Toggle()
-    if (ADOptions.ADtoggle == 1) then
-        ADOptions.ADtoggle = 0;
+    if (ADOptions.ADtoggle) then
+        ADOptions.ADtoggle = false;
         if (DEFAULT_CHAT_FRAME) then
             DEFAULT_CHAT_FRAME:AddMessage(TXT_AD_OFF, 1, 1, 0.5);
         end
     else
-        ADOptions.ADtoggle = 1
+        ADOptions.ADtoggle = true
         if (DEFAULT_CHAT_FRAME) then
             DEFAULT_CHAT_FRAME:AddMessage(TXT_AD_ON, 1, 1, 0.5);
         end
     end
 end
 
-function ADCCheet_Togle()
-    if (ADOptions.ADCCheet == 1) then
-        ADOptions.ADCCheet = 0;
+function ADCCheet_Toggle()
+    if (ADOptions.ADCCheet) then
+        ADOptions.ADCCheet = false;
         if (DEFAULT_CHAT_FRAME) then
             DEFAULT_CHAT_FRAME:AddMessage(TXT_CHEETAH_OFF, 1, 1, 0.5);
         end
     else
-        ADOptions.ADCCheet = 1;
+        ADOptions.ADCCheet = true;
         if (DEFAULT_CHAT_FRAME) then
             DEFAULT_CHAT_FRAME:AddMessage(TXT_CHEETAH_ON, 1, 1, 0.5);
         end
@@ -160,13 +145,13 @@ function ADCCheet_Togle()
 end
 
 function ADCPack_Toggle()
-    if (ADOptions.ADCPack == 1) then
-        ADOptions.ADCPack = 0;
+    if (ADOptions.ADCPack) then
+        ADOptions.ADCPack = false;
         if (DEFAULT_CHAT_FRAME) then
             DEFAULT_CHAT_FRAME:AddMessage(TXT_PACK_OFF, 1, 1, 0.5);
         end
     else
-        ADOptions.ADCPack = 1;
+        ADOptions.ADCPack = true;
         if (DEFAULT_CHAT_FRAME) then
             DEFAULT_CHAT_FRAME:AddMessage(TXT_PACK_ON, 1, 1, 0.5);
         end
@@ -174,13 +159,13 @@ function ADCPack_Toggle()
 end
 
 function ADCPackPets_Toggle()
-    if (ADOptions.ADCPackPets == 1) then
-        ADOptions.ADCPackPets = 0;
+    if (ADOptions.ADCPackPets) then
+        ADOptions.ADCPackPets = false;
         if (DEFAULT_CHAT_FRAME) then
             DEFAULT_CHAT_FRAME:AddMessage(TXT_PACK_ON_PETS_OFF, 1, 1, 0.5);
         end
     else
-        ADOptions.ADCPackPets = 1;
+        ADOptions.ADCPackPets = true;
         if (DEFAULT_CHAT_FRAME) then
             DEFAULT_CHAT_FRAME:AddMessage(TXT_PACK_ON_PETS_ON, 1, 1, 0.5);
         end
@@ -188,13 +173,13 @@ function ADCPackPets_Toggle()
 end
 
 function ADRaidWarning_Toggle()
-    if (ADOptions.ADRaidWarning == 1) then
-        ADOptions.ADRaidWarning = 0;
+    if (ADOptions.ADRaidWarning) then
+        ADOptions.ADRaidWarning = false;
         if (DEFAULT_CHAT_FRAME) then
             DEFAULT_CHAT_FRAME:AddMessage(TXT_RAIDWARNING_OFF, 1, 1, 0.5);
         end
     else
-        ADOptions.ADRaidWarning = 1;
+        ADOptions.ADRaidWarning = true;
         if (DEFAULT_CHAT_FRAME) then
             DEFAULT_CHAT_FRAME:AddMessage(TXT_RAIDWARNING_ON, 1, 1, 0.5);
         end
@@ -202,18 +187,19 @@ function ADRaidWarning_Toggle()
 end
 
 function ADChatMessage_Toggle()
-    if (ADOptions.ADChatMessage == 1) then
-        ADOptions.ADChatMessage = 0;
+    if (ADOptions.ADChatMessage) then
+        ADOptions.ADChatMessage = false;
         if (DEFAULT_CHAT_FRAME) then
             DEFAULT_CHAT_FRAME:AddMessage(TXT_CHATMESSAGE_OFF, 1, 1, 0.5);
         end
     else
-        ADOptions.ADChatMessage = 1;
+        ADOptions.ADChatMessage = true;
         if (DEFAULT_CHAT_FRAME) then
             DEFAULT_CHAT_FRAME:AddMessage(TXT_CHATMESSAGE_ON, 1, 1, 0.5);
         end
     end
 end
+
 ------------------------
 -- Helper Functions  --
 ------------------------
@@ -302,12 +288,12 @@ function CPlayerBuff(buff, a)
                     text = string.format("%s is using Aspect of the Cheetah!", caster_name);
                 end
 
-                if ADOptions.ADRaidWarning == 1 then
+                if ADOptions.ADRaidWarning then
                     RaidNotice_AddMessage(RaidWarningFrame, text, ChatTypeInfo["RAID_WARNING"]);
                     PlaySoundFile("Sound\\Spells\\PVPFlagTaken.wav");
                 end
 
-                if ADOptions.ADChatMessage == 1 then
+                if ADOptions.ADChatMessage then
                     print(text);
                 end
 
