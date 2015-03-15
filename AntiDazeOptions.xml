@@ -32,7 +32,7 @@
 						getglobal(self:GetName().."Text"):SetText(OPT_CHEETAH);
 					</OnLoad>
 					<OnClick>
-						ADCCheet_Toogle();
+						ADCCheet_Toggle();
 					</OnClick>
 				</Scripts>
 			</CheckButton>
@@ -49,7 +49,7 @@
 						getglobal(self:GetName().."Text"):SetText(OPT_PACK);
 					</OnLoad>
 					<OnClick>
-						ADCPack_Toogle();
+						ADCPack_Toggle();
 					</OnClick>
 				</Scripts>
 			</CheckButton>
@@ -60,7 +60,7 @@
 				<Anchors>
 					<Anchor point="TOPLEFT">
 						<Offset>
-							<AbsDimension x="55" y="-125"/>
+							<AbsDimension x="55" y="-120"/>
 						</Offset>
 					</Anchor>
 				</Anchors>
@@ -69,10 +69,44 @@
 						getglobal(self:GetName().."Text"):SetText(OPT_PACKPETS);
 					</OnLoad>
 					<OnClick>
-						ADCPackPets_Toogle();
+						ADCPackPets_Toggle();
 					</OnClick>
 				</Scripts>
 			</CheckButton>
+            <CheckButton name="AntiDazeOptionsFrameADRaidWarning" inherits="OptionsCheckButtonTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="40" y="-140"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnLoad>
+                        getglobal(self:GetName().."Text"):SetText(OPT_RAIDWARNING);
+                    </OnLoad>
+                    <OnClick>
+                        ADRaidWarning_Toggle();
+                    </OnClick>
+                </Scripts>
+            </CheckButton>
+            <CheckButton name="AntiDazeOptionsFrameADChatMessage" inherits="OptionsCheckButtonTemplate">
+                <Anchors>
+                    <Anchor point="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="40" y="-160"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Scripts>
+                    <OnLoad>
+                        getglobal(self:GetName().."Text"):SetText(OPT_CHATMESSAGE);
+                    </OnLoad>
+                    <OnClick>
+                        ADChatMessage_Toggle();
+                    </OnClick>
+                </Scripts>
+            </CheckButton>
 		</Frames>
 		<Scripts>
 			<OnLoad>

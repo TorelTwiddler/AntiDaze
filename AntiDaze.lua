@@ -110,11 +110,11 @@ function AD_SlashCommand(msg)
         if (msg == "toggle") then
             AD_Toggle();
         elseif (msg == "ccheet") then
-            ADCCheet_Toogle()
+            ADCCheet_Toggle()
         elseif (msg == "cpack") then
-            ADCPack_Toogle()
+            ADCPack_Toggle()
         elseif (msg == "cpackpets") then
-            ADCPackPets_Toogle()
+            ADCPackPets_Toggle()
         else
             if (DEFAULT_CHAT_FRAME) then
                 DEFAULT_CHAT_FRAME:AddMessage(AD_VERS_TITLE, 1, 1, 0.5);
@@ -145,7 +145,7 @@ function AD_Toggle()
     end
 end
 
-function ADCCheet_Toogle()
+function ADCCheet_Togle()
     if (ADOptions.ADCCheet == 1) then
         ADOptions.ADCCheet = 0;
         if (DEFAULT_CHAT_FRAME) then
@@ -159,7 +159,7 @@ function ADCCheet_Toogle()
     end
 end
 
-function ADCPack_Toogle()
+function ADCPack_Toggle()
     if (ADOptions.ADCPack == 1) then
         ADOptions.ADCPack = 0;
         if (DEFAULT_CHAT_FRAME) then
@@ -173,7 +173,7 @@ function ADCPack_Toogle()
     end
 end
 
-function ADCPackPets_Toogle()
+function ADCPackPets_Toggle()
     if (ADOptions.ADCPackPets == 1) then
         ADOptions.ADCPackPets = 0;
         if (DEFAULT_CHAT_FRAME) then
@@ -187,6 +187,33 @@ function ADCPackPets_Toogle()
     end
 end
 
+function ADRaidWarning_Toggle()
+    if (ADOptions.ADRaidWarning == 1) then
+        ADOptions.ADRaidWarning = 0;
+        if (DEFAULT_CHAT_FRAME) then
+            DEFAULT_CHAT_FRAME:AddMessage(TXT_RAIDWARNING_OFF, 1, 1, 0.5);
+        end
+    else
+        ADOptions.ADRaidWarning = 1;
+        if (DEFAULT_CHAT_FRAME) then
+            DEFAULT_CHAT_FRAME:AddMessage(TXT_RAIDWARNING_ON, 1, 1, 0.5);
+        end
+    end
+end
+
+function ADChatMessage_Toggle()
+    if (ADOptions.ADChatMessage == 1) then
+        ADOptions.ADChatMessage = 0;
+        if (DEFAULT_CHAT_FRAME) then
+            DEFAULT_CHAT_FRAME:AddMessage(TXT_CHATMESSAGE_OFF, 1, 1, 0.5);
+        end
+    else
+        ADOptions.ADChatMessage = 1;
+        if (DEFAULT_CHAT_FRAME) then
+            DEFAULT_CHAT_FRAME:AddMessage(TXT_CHATMESSAGE_ON, 1, 1, 0.5);
+        end
+    end
+end
 ------------------------
 -- Helper Functions  --
 ------------------------
@@ -236,25 +263,53 @@ function TargetBuff(buff, Unit)
     end
 end
 
+
+local color = setmetatable({}, {__index = function(t, cl)
+	local colorSet = CUSTOM_CLASS_COLORS and CUSTOM_CLASS_COLORS[cl] or RAID_CLASS_COLORS[cl]
+	if colorSet then
+		t[cl] = ("ff%02x%02x%02x"):format(colorSet.r * 255, colorSet.g * 255, colorSet.b * 255)
+	else
+		t[cl] = "ffffffff"
+	end
+	return t[cl]
+end })
+
+
 -- same but will return right index for use with CancelPlayerBuff
 function CPlayerBuff(buff, a)
     local iIterator = 1
-    local texture
+    local texture, caster, caster_name, class, _
     while (UnitBuff('player', iIterator)) do
-        _, _, texture, _ = UnitBuff('player', iIterator);
+        _, _, texture, _, _, _, _, caster = UnitBuff('player', iIterator);
         if texture then
             if (string.find(texture, buff)) then
                 --if ( DEFAULT_CHAT_FRAME ) then DEFAULT_CHAT_FRAME:AddMessage("CPlayer: "..GetPlayerBuffTexture(iIterator)..", iIterator: "..iIterator, 1, 1, 0.5) end
+                _, class = UnitClass(caster)
+                if caster then
+                    caster_name = string.format("|c%s%s|r", color[class], UnitName(caster));
+                else
+                    caster_name = "Unknown Player"
+                end
                 local text = ""
                 if (buff == "WhiteTiger") then
-                    text = "Turn off Aspect of the Pack!"
+                    if UnitName(caster) == UnitName('player') then
+                        text = "Turn off Aspect of the Pack!"
+                    else
+                        text = string.format("%s is using Aspect of the Pack!", caster_name);
+                    end
                 else
-                    text = "Turn off Aspect of the Cheetah!"
+--                    text = "Turn off Aspect of the Cheetah!"
+                    text = string.format("%s is using Aspect of the Cheetah!", caster_name);
                 end
-                RaidNotice_AddMessage(RaidWarningFrame, text, ChatTypeInfo["RAID_WARNING"])
 
-                --PlaySoundFile("Sound\\Doodad\\BellTollNightElf.wav")
-                PlaySoundFile("Sound\\Spells\\PVPFlagTaken.wav")
+                if ADOptions.ADRaidWarning == 1 then
+                    RaidNotice_AddMessage(RaidWarningFrame, text, ChatTypeInfo["RAID_WARNING"]);
+                    PlaySoundFile("Sound\\Spells\\PVPFlagTaken.wav");
+                end
+
+                if ADOptions.ADChatMessage == 1 then
+                    print(text);
+                end
 
                 -- This function is now protected, and can not be called from an addon.
                 --CancelUnitBuff('player',UnitBuff('player',iIterator))

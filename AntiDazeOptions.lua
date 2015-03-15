@@ -23,6 +23,8 @@ function ADOptions_Init()
         ADOptions.ADCCheet = 1;
         ADOptions.ADCPack = 1;
         ADOptions.ADCPackPets = 1;
+        ADOptions.ADRaidWarning = 1;
+        ADOptions.ADChatMessage = 0;
     elseif (ADOptions.ADtoggle == nil) then
         ADOptions.ADtoggle = 1;
     elseif (ADOptions.ADCCheet == nil) then
@@ -31,11 +33,17 @@ function ADOptions_Init()
         ADOptions.ADCPack = 1;
     elseif (ADOptions.ADCPackPets == nil) then
         ADOptions.ADCPackPets = 1;
+    elseif (ADOptions.ADRaidWarning == nil) then
+        ADOptions.ADRaidWarning = 1;
+    elseif (ADOptions.ADChatMessage == nil) then
+        ADOptions.ADChatMessage = 0;
     end
     AntiDazeOptionsFrameADtoggle:SetChecked(ADOptions.ADtoggle);
     AntiDazeOptionsFrameADCCheet:SetChecked(ADOptions.ADCCheet);
     AntiDazeOptionsFrameADCPack:SetChecked(ADOptions.ADCPack);
     AntiDazeOptionsFrameADCPackPets:SetChecked(ADOptions.ADCPackPets)
+    AntiDazeOptionsFrameADRaidWarning:SetChecked(ADOptions.ADRaidWarning)
+    AntiDazeOptionsFrameADChatMessage:SetChecked(ADOptions.ADChatMessage)
 end
 
 function ADOptions_OnHide(self)
