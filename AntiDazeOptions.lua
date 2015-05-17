@@ -37,7 +37,7 @@ function ADOptions_Init()
 end
 
 function ADOptions_OnLoad(panel)
-    panel.name = "AntiDaze " .. GetAddOnMetadata("AntiDaze", "Version")
+    panel.name = "AntiDaze"
     InterfaceOptions_AddCategory(panel);
 end
 

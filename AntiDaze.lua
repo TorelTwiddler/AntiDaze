@@ -13,9 +13,7 @@
 -- Warlords of Draenor	: TorelTwiddler
 --------------------------------------------------
 
-AD_VERSION = "v1.0.3";
 AD_TITLE = "AntiDaze";
-AD_VERS_TITLE = AD_TITLE .. " " .. AD_VERSION;
 
 BINDING_HEADER_AD_TITLE = AD_TITLE;
 BINDING_NAME_AD_TOGGLE = TXT_TOGGLE .. " " .. AD_TITLE;
@@ -24,7 +22,7 @@ BINDING_HEADER_AD_OPTIONS_TITLE = AD_TITLE;
 
 AD_variables_loaded = false;
 
---AD_TEXT_AURA = string.gsub(AURAADDEDOTHERHARMFUL,'%%s','(.+)')
+AD_ready_for_warning = true;
 
 function AD_OnLoad(self)
     local _, class = UnitClass("player");
@@ -37,9 +35,9 @@ function AD_OnLoad(self)
 
         self:RegisterEvent("PLAYER_AURAS_CHANGED");
 
-        DEFAULT_CHAT_FRAME:AddMessage(AD_VERS_TITLE .. " " .. TXT_LOADED, 1, 1, 0.5);
+        DEFAULT_CHAT_FRAME:AddMessage(AD_TITLE .. " " .. TXT_LOADED, 1, 1, 0.5);
     else
-        DEFAULT_CHAT_FRAME:AddMessage(AD_VERS_TITLE .. " " .. TXT_NOTLOADED, 1, 1, 0.5);
+        DEFAULT_CHAT_FRAME:AddMessage(AD_TITLE .. " " .. TXT_NOTLOADED, 1, 1, 0.5);
     end
     SLASH_AD1 = "/AD";
     SLASH_AD2 = "/antidaze";
@@ -51,7 +49,7 @@ end
 
 function AD_OnEvent(self, event, ...)
     local arg1 = select(1, ...)
-    if IsMounted() then
+    if IsMounted() or not AD_ready_for_warning then
         --do nothing
     else
         if (event == "UNIT_AURA") then
@@ -80,39 +78,15 @@ function AD_OnEvent(self, event, ...)
             ADOptions_Init();
             AD_variables_loaded = true;
         end
-        ---------------------
-        -- support for Cosmos
-        ---------------------
-        if (Cosmos_RegisterButton) then
-            Cosmos_RegisterButton(AD_VERS_TITLE,
-                AD_SUBTITLE,
-                AD_DESC,
-                "Interface\\Icons\\Ability_Mount_JungleTiger",
-                ADOptions_Toggle);
-        end
-
-        -----------------------
-        -- support for myAddOns
-        -----------------------
-        if (myAddOnsFrame) then
-            myAddOnsList.AD = {
-                name = AD_TITLE,
-                description = AD_DESC,
-                version = AD_VERSION,
-                category = MYADDONS_CATEGORY_COMBAT,
-                frame = "AntiDazeFrame",
-                optionsframe = 'AntiDazeOptionsFrame'
-            };
-        end
     end
 end
 
 function AD_SlashCommand(msg)
     local _, class = UnitClass("player");
     if (class == "HUNTER") then
-        InterfaceOptionsFrame_OpenToCategory("AntiDaze " .. GetAddOnMetadata("AntiDaze", "Version"))
+        InterfaceOptionsFrame_OpenToCategory("AntiDaze")
     else
-        DEFAULT_CHAT_FRAME:AddMessage(AD_VERS_TITLE .. " " .. TXT_NOTLOADED, 1, 1, 0.5);
+        DEFAULT_CHAT_FRAME:AddMessage(AD_TITLE .. " " .. TXT_NOTLOADED, 1, 1, 0.5);
     end
 end
 
@@ -204,34 +178,36 @@ end
 -- Helper Functions  --
 ------------------------
 
---Loops through all of the buffs currently active looking for a string match
+-- Loops through all of the buffs currently active looking for a 
+-- string match on the Player
 function PlayerBuff(buff)
-    local iIterator = 1
-    while (UnitBuff("player", iIterator)) or (UnitDebuff("player", iIterator)) do
-        Buff1 = UnitBuff("player", iIterator)
-        DeBuff1 = UnitDebuff("player", iIterator)
+    local i = 1
+    while (UnitBuff("player", i)) or (UnitDebuff("player", i)) do
+        Buff1 = UnitBuff("player", i)
+        DeBuff1 = UnitDebuff("player", i)
         if (Buff1) then
             if (string.find(Buff1, buff)) then
-                return iIterator - 1
+                return i - 1
             end
         end
         if (DeBuff1) then
             if (string.find(DeBuff1, buff)) then
-                return iIterator - 1
+                return i - 1
             end
         end
-        iIterator = iIterator + 1
+        i = i + 1
     end
 end
 
--- same for Target or (if specified) for Unit
+-- Loops through all of the buffs currently active looking for a 
+-- string match for Target or (if specified) for Unit
 function TargetBuff(buff, Unit)
-    local iIterator = 1
+    local i = 1
     if (Unit) then what = Unit else what = "target" end
-    while (UnitBuff(what, iIterator)) or (UnitDebuff(what, iIterator)) do
+    while (UnitBuff(what, i)) or (UnitDebuff(what, i)) do
         found = false
-        Buff1 = UnitBuff(what, iIterator)
-        DeBuff1 = UnitDebuff(what, iIterator)
+        Buff1 = UnitBuff(what, i)
+        DeBuff1 = UnitDebuff(what, i)
         if (Buff1) then
             if (string.find(Buff1, buff)) then
                 found = true
@@ -243,9 +219,9 @@ function TargetBuff(buff, Unit)
             end
         end
         if (found) then
-            return iIterator;
+            return i;
         end
-        iIterator = iIterator + 1
+        i = i + 1
     end
 end
 
@@ -261,18 +237,25 @@ local color = setmetatable({}, {__index = function(t, cl)
 end })
 
 
--- same but will return right index for use with CancelPlayerBuff
-function CPlayerBuff(buff, a)
-    local iIterator = 1
+-- Loops through all of the buffs currently active looking for a 
+-- string match, then print to chat or raid warn the player
+function CPlayerBuff(buff)
+    local i = 1
     local texture, caster, caster_name, class, _
-    while (UnitBuff('player', iIterator)) do
-        _, _, texture, _, _, _, _, caster = UnitBuff('player', iIterator);
+    
+    while (UnitBuff('player', i)) do
+        _, _, texture, _, _, _, _, caster = UnitBuff('player', i);
         if texture then
             if (string.find(texture, buff)) then
-                --if ( DEFAULT_CHAT_FRAME ) then DEFAULT_CHAT_FRAME:AddMessage("CPlayer: "..GetPlayerBuffTexture(iIterator)..", iIterator: "..iIterator, 1, 1, 0.5) end
+                AD_ready_for_warning = false
+                --if ( DEFAULT_CHAT_FRAME ) then DEFAULT_CHAT_FRAME:AddMessage("CPlayer: "..GetPlayerBuffTexture(i)..", i: "..i, 1, 1, 0.5) end
                 _, class = UnitClass(caster)
                 if caster then
-                    caster_name = string.format("|c%s%s|r", color[class], UnitName(caster));
+                    name, realm = UnitName(caster)
+                    if realm then
+                        name = string.format("%s-%s", name, realm)
+                    end
+                    caster_name = string.format("|c%s%s|r", color[class], name);
                 else
                     caster_name = "Unknown Player"
                 end
@@ -284,8 +267,7 @@ function CPlayerBuff(buff, a)
                         text = string.format("%s is using Aspect of the Pack!", caster_name);
                     end
                 else
---                    text = "Turn off Aspect of the Cheetah!"
-                    text = string.format("%s is using Aspect of the Cheetah!", caster_name);
+                    text = "Turn off Aspect of the Cheetah!"
                 end
 
                 if ADOptions.ADRaidWarning then
@@ -298,14 +280,14 @@ function CPlayerBuff(buff, a)
                 end
 
                 -- This function is now protected, and can not be called from an addon.
-                --CancelUnitBuff('player',UnitBuff('player',iIterator))
+                --CancelUnitBuff('player',UnitBuff('player',i))
 
-                return UnitBuff('player', iIterator)
+                return UnitBuff('player', i)
             end
         else
             break;
         end
-        iIterator = iIterator + 1
+        i = i + 1
     end
 end
 
@@ -370,5 +352,18 @@ end
 function isPackActive()
     if PlayerBuff(SPELL_PACK) then
         return true
+    end
+end
+
+local AD_WarningInterval = 10
+local AD_TimeRemainingForWarning = AD_WarningInterval
+
+function AD_OnUpdate(self, elapsed)
+    if not AD_ready_for_warning then
+        AD_TimeRemainingForWarning = AD_TimeRemainingForWarning - elapsed
+        if AD_TimeRemainingForWarning < 0 then
+            AD_ready_for_warning = true;
+            AD_TimeRemainingForWarning = AD_WarningInterval
+        end
     end
 end

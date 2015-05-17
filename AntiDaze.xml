@@ -12,6 +12,7 @@
 	<Scripts>
 		<OnLoad function="AD_OnLoad"/>
 		<OnEvent function="AD_OnEvent"/>
+        <OnUpdate function="AD_OnUpdate" />
 	</Scripts>
     </Frame>
 </Ui>
