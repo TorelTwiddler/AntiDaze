@@ -25,20 +25,13 @@ AD_variables_loaded = false;
 AD_ready_for_warning = true;
 
 function AD_OnLoad(self)
-    local _, class = UnitClass("player");
-    if (class == "HUNTER") then
-        --local frame = CreateFrame("FRAME", "FooAddonFrame");
+    self:RegisterEvent("VARIABLES_LOADED");
 
-        self:RegisterEvent("VARIABLES_LOADED");
+    self:RegisterEvent("UNIT_AURA"); -- Triggers when Player becomes Buff
 
-        self:RegisterEvent("UNIT_AURA"); -- Triggers when Player becomes Buff
+    self:RegisterEvent("PLAYER_AURAS_CHANGED");
 
-        self:RegisterEvent("PLAYER_AURAS_CHANGED");
-
-        DEFAULT_CHAT_FRAME:AddMessage(AD_TITLE .. " " .. TXT_LOADED, 1, 1, 0.5);
-    else
-        DEFAULT_CHAT_FRAME:AddMessage(AD_TITLE .. " " .. TXT_NOTLOADED, 1, 1, 0.5);
-    end
+    DEFAULT_CHAT_FRAME:AddMessage(AD_TITLE .. " " .. TXT_LOADED, 1, 1, 0.5);
     SLASH_AD1 = "/AD";
     SLASH_AD2 = "/antidaze";
 
@@ -82,12 +75,7 @@ function AD_OnEvent(self, event, ...)
 end
 
 function AD_SlashCommand(msg)
-    local _, class = UnitClass("player");
-    if (class == "HUNTER") then
-        InterfaceOptionsFrame_OpenToCategory("AntiDaze")
-    else
-        DEFAULT_CHAT_FRAME:AddMessage(AD_TITLE .. " " .. TXT_NOTLOADED, 1, 1, 0.5);
-    end
+    InterfaceOptionsFrame_OpenToCategory("AntiDaze")
 end
 
 function AD_Toggle()
@@ -178,7 +166,7 @@ end
 -- Helper Functions  --
 ------------------------
 
--- Loops through all of the buffs currently active looking for a 
+-- Loops through all of the buffs currently active looking for a
 -- string match on the Player
 function PlayerBuff(buff)
     local i = 1
@@ -199,7 +187,7 @@ function PlayerBuff(buff)
     end
 end
 
--- Loops through all of the buffs currently active looking for a 
+-- Loops through all of the buffs currently active looking for a
 -- string match for Target or (if specified) for Unit
 function TargetBuff(buff, Unit)
     local i = 1
@@ -237,12 +225,12 @@ local color = setmetatable({}, {__index = function(t, cl)
 end })
 
 
--- Loops through all of the buffs currently active looking for a 
+-- Loops through all of the buffs currently active looking for a
 -- string match, then print to chat or raid warn the player
 function CPlayerBuff(buff)
     local i = 1
     local texture, caster, caster_name, class, _
-    
+
     while (UnitBuff('player', i)) do
         _, _, texture, _, _, _, _, caster = UnitBuff('player', i);
         if texture then

@@ -1,5 +1,5 @@
 ## Interface: 60100
-## Version: 6.1.2.1
+## Version: 6.1.2.2
 ## Title: AntiDaze
 ## Author: by TorelTwiddler, Original by Qsek, BC bugfix by xbjim, Multilanguage by Minihunt EU@Ner'zhul
 ## Notes: Annoys you when you get dazed by Aspect of the Cheetah or Aspect of the Pack.
@@ -9,7 +9,7 @@
 ## Notes-koKR: Annoys you when you get dazed by Aspect of the Cheetah or Aspect of the Pack.
 ## Notes-zhCN: Annoys you when you get dazed by Aspect of the Cheetah or Aspect of the Pack.
 ## Notes-zhTW: Annoys you when you get dazed by Aspect of the Cheetah or Aspect of the Pack.
-## OptionalDeps: 
+## OptionalDeps:
 ## SavedVariablesPerCharacter: ADOptions
 AntiDaze.xml
 AntiDazeOptions.xml
