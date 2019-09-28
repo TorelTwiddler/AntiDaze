@@ -1,7 +1,6 @@
 --------------------------------------------------
 --
 -- AddOn			: AntiDaze
--- Date			: 2014.10.13
 -- Author			: Qsek
 -- Burning Crusade Bugfix	: xbjim
 -- BC Multilanguage		: Minihunt EU@Ner'zhul
@@ -11,6 +10,7 @@
 -- Cataclysm			: TorelTwiddler
 -- Mists of Pandaria	: TorelTwiddler
 -- Warlords of Draenor	: TorelTwiddler
+-- Classic              : TorelTwiddler
 --------------------------------------------------
 
 AD_TITLE = "AntiDaze";
@@ -29,13 +29,12 @@ function AD_OnLoad(self)
 
     self:RegisterEvent("UNIT_AURA"); -- Triggers when Player becomes Buff
 
-    self:RegisterEvent("PLAYER_AURAS_CHANGED");
-
     DEFAULT_CHAT_FRAME:AddMessage(AD_TITLE .. " " .. TXT_LOADED, 1, 1, 0.5);
     SLASH_AD1 = "/AD";
     SLASH_AD2 = "/antidaze";
 
     SlashCmdList["AD"] = function(msg)
+        AD_SlashCommand(msg);
         AD_SlashCommand(msg);
     end
 end
@@ -47,21 +46,7 @@ function AD_OnEvent(self, event, ...)
     else
         if (event == "UNIT_AURA") then
             if ADOptions.ADtoggle then
-                if ADOptions.ADCCheet and arg1 == "player" and PlayerBuff(BUFF_DAZED) and isCheetahActive() then
-                    CPlayerBuff("JungleTiger")
-                end
-                if ADOptions.ADCPack and arg1 == "player" and PlayerBuff(BUFF_DAZED) and isPackActive() then
-                    CPlayerBuff("WhiteTiger")
-                end
-                if ADOptions.ADCPack and (string.find(arg1, "party%d")) and TargetBuff(BUFF_DAZED, arg1) and isPackActive() then
-                    CPlayerBuff("WhiteTiger")
-                end
-                if ADOptions.ADCPack and (string.find(arg1, "raid%d")) and TargetBuff(BUFF_DAZED, arg1) and isPackActive() then
-                    CPlayerBuff("WhiteTiger")
-                end
-                if ADOptions.ADCPackPets and (string.find(arg1, "pet")) and TargetBuff(BUFF_DAZED, arg1) and isPackActive() then
-                    CPlayerBuff("WhiteTiger")
-                end
+                CPlayerBuff()
             end
         end
     end
@@ -166,53 +151,6 @@ end
 -- Helper Functions  --
 ------------------------
 
--- Loops through all of the buffs currently active looking for a
--- string match on the Player
-function PlayerBuff(buff)
-    local i = 1
-    while (UnitBuff("player", i)) or (UnitDebuff("player", i)) do
-        Buff1 = UnitBuff("player", i)
-        DeBuff1 = UnitDebuff("player", i)
-        if (Buff1) then
-            if (string.find(Buff1, buff)) then
-                return i - 1
-            end
-        end
-        if (DeBuff1) then
-            if (string.find(DeBuff1, buff)) then
-                return i - 1
-            end
-        end
-        i = i + 1
-    end
-end
-
--- Loops through all of the buffs currently active looking for a
--- string match for Target or (if specified) for Unit
-function TargetBuff(buff, Unit)
-    local i = 1
-    if (Unit) then what = Unit else what = "target" end
-    while (UnitBuff(what, i)) or (UnitDebuff(what, i)) do
-        found = false
-        Buff1 = UnitBuff(what, i)
-        DeBuff1 = UnitDebuff(what, i)
-        if (Buff1) then
-            if (string.find(Buff1, buff)) then
-                found = true
-            end
-        end
-        if (DeBuff1) then
-            if (string.find(DeBuff1, buff)) then
-                found = true
-            end
-        end
-        if (found) then
-            return i;
-        end
-        i = i + 1
-    end
-end
-
 
 local color = setmetatable({}, {__index = function(t, cl)
 	local colorSet = CUSTOM_CLASS_COLORS and CUSTOM_CLASS_COLORS[cl] or RAID_CLASS_COLORS[cl]
@@ -225,121 +163,93 @@ local color = setmetatable({}, {__index = function(t, cl)
 end })
 
 
--- Loops through all of the buffs currently active looking for a
--- string match, then print to chat or raid warn the player
-function CPlayerBuff(buff)
-    local i = 1
-    local texture, caster, caster_name, class, _
+local function getCasterName(caster)
+    _, class = UnitClass(caster)
+    if caster then
+        name, realm = UnitName(caster)
+        if realm then
+            name = string.format("%s-%s", name, realm)
+        end
+        caster_name = string.format("|c%s%s|r", color[class], name);
+    else
+        caster_name = "Unknown Player"
+    end
+    return caster_name
+end
 
-    while (UnitBuff('player', i)) do
-        _, _, texture, _, _, _, _, caster = UnitBuff('player', i);
-        if texture then
-            if (string.find(texture, buff)) then
-                AD_ready_for_warning = false
-                --if ( DEFAULT_CHAT_FRAME ) then DEFAULT_CHAT_FRAME:AddMessage("CPlayer: "..GetPlayerBuffTexture(i)..", i: "..i, 1, 1, 0.5) end
-                _, class = UnitClass(caster)
-                if caster then
-                    name, realm = UnitName(caster)
-                    if realm then
-                        name = string.format("%s-%s", name, realm)
-                    end
-                    caster_name = string.format("|c%s%s|r", color[class], name);
-                else
-                    caster_name = "Unknown Player"
-                end
-                local text = ""
-                if (buff == "WhiteTiger") then
-                    if UnitName(caster) == UnitName('player') then
-                        text = "Turn off Aspect of the Pack!"
-                    else
-                        text = string.format("%s is using Aspect of the Pack!", caster_name);
-                    end
-                else
-                    text = "Turn off Aspect of the Cheetah!"
-                end
 
-                if ADOptions.ADRaidWarning then
-                    RaidNotice_AddMessage(RaidWarningFrame, text, ChatTypeInfo["RAID_WARNING"]);
-                    PlaySoundFile("Sound\\Spells\\PVPFlagTaken.wav");
-                end
+local function HandleRaidWarning(message)
+    if ADOptions.ADRaidWarning then
+        RaidNotice_AddMessage(RaidWarningFrame, message, ChatTypeInfo["RAID_WARNING"]);
+        PlaySound(8959); -- Raid warning
+    end
+end
 
-                if ADOptions.ADChatMessage then
-                    print(text);
-                end
 
-                -- This function is now protected, and can not be called from an addon.
-                --CancelUnitBuff('player',UnitBuff('player',i))
+local function HandleChatMessage(message)
+    if ADOptions.ADChatMessage then
+        print(message);
+    end
+end
 
-                return UnitBuff('player', i)
-            end
+
+local function HandleCheetah()
+    if ADOptions.ADCCheet then
+        local message = "Turn off Aspect of the Cheetah!"
+        HandleRaidWarning(message)
+        HandleChatMessage(message)
+    end
+end
+
+
+local function HandlePack(caster)
+    if ADOptions.ADCPack then
+        if caster == 'player' then
+            local message = "Turn off Aspect of the Pack!"
         else
-            break;
+            local caster_name = getCasterName(caster)
+            local message = string.format("%s is using Aspect of the Pack!", caster_name);
+        end
+        HandleRaidWarning(message)
+        HandleChatMessage(message)
+    end
+end
+
+
+local function ScanForBuff()
+    local i = 1
+    while (UnitBuff('player', i)) do
+        local spellID = select(10, UnitBuff('player', i))
+        if spellID == 5118 then -- AotC
+            HandleCheetah()
+        elseif spellID == 13159 then -- AotP
+            local caster = select(7, UnitBuff('player', i))
+            HandlePack(caster)
+        else
+            -- Not Cheetah or Pack, ignore
         end
         i = i + 1
     end
 end
 
 
-function GetSpellBookSlotTex(wtexture)
-    --Sea.IO.print("----- "..spell)
-    local i = 1;
-    while true do
-        local spellName, spellRank = GetSpellName(i, BOOKTYPE_SPELL);
-        local texture = GetSpellTexture(i, BOOKTYPE_SPELL)
-        if not spellName then
-            do break end;
-        end
-        --Sea.IO.print("Vergleiche: "..spellName.." == "..spell);
-        if (string.find(texture, wtexture)) then
-            --Sea.IO.print("Tex: "..texture.." == "..wtexture..", Buchplatz: "..i);
-            spelltexture = texture
-            spellbookslot = i
-            --Sea.IO.print("Textur: "..spelltexture);
-            do break end;
-        end
-        i = i + 1;
-    end
-    BuffPos = TargetBuff(spelltexture)
-    --Sea.IO.print(BuffPos)
-    return spellbookslot, spellName, spelltexture, BuffPos
-end
+-- Loops through all of the buffs currently active looking for a
+-- string match, then print to chat or raid warn the player
+function CPlayerBuff()
+    local i = 1
+    local caster, spellID
 
+    while (UnitDebuff('player', i)) do
+        spellID = select(10, UnitDebuff('player', i))
+        caster = select(7, UnitDebuff('player', i))
+        if spellID and spellID == 15571 then -- Dazed'
+            AD_ready_for_warning = false
 
-function GetSpellBookSlot(spell)
-    --Sea.IO.print("----- "..spell)
-    local i = 1;
-    while true do
-        local spellName, spellRank = GetSpellName(i, BOOKTYPE_SPELL);
-        local texture = GetSpellTexture(i, BOOKTYPE_SPELL)
-        if not spellName then
-            do break end;
+            ScanForBuff()
+        else
+            break;
         end
-        --Sea.IO.print("Vergleiche: "..spellName.." == "..spell);
-        if (string.find(spellName, spell)) then
-            --Sea.IO.print(spellName.." == "..spell..", Buchplatz: "..i);
-            spelltexture = texture
-            spellbookslot = i
-            --Sea.IO.print("Textur: "..spelltexture);
-            do break end;
-        end
-        i = i + 1;
-    end
-    BuffPos = TargetBuff(spelltexture)
-    --Sea.IO.print(BuffPos)
-    return spellbookslot, spellName, spelltexture, BuffPos
-end
-
---Returns true if Aspect of the Cheetah is active
-function isCheetahActive()
-    if PlayerBuff(SPELL_CHEETAH) then
-        return true
-    end
-end
-
---Returns true if Aspect of the Pack is active
-function isPackActive()
-    if PlayerBuff(SPELL_PACK) then
-        return true
+        i = i + 1
     end
 end
 

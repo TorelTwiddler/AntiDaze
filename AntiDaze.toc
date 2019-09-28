@@ -1,7 +1,7 @@
-## Interface: 60100
-## Version: 6.1.2.2
+## Interface: 11302
+## Version: 7
 ## Title: AntiDaze
-## Author: by TorelTwiddler, Original by Qsek, BC bugfix by xbjim, Multilanguage by Minihunt EU@Ner'zhul
+## Author: TorelTwiddler
 ## Notes: Annoys you when you get dazed by Aspect of the Cheetah or Aspect of the Pack.
 ## Notes-deDE: Gepard deaktivieren falls aktiv und benommen.
 ## Notes-esES: Annoys you when you get dazed by Aspect of the Cheetah or Aspect of the Pack.
